@@ -12,7 +12,7 @@ pipeline {
                 script {
                     def packageJSON = readJSON file: 'package.json'
                     env.appVersion = packageJSON.version
-                    echo "package version: ${appVersion}"
+                    echo "package version: ${env.appVersion}"
                 }
             }
         }
@@ -20,24 +20,24 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh """
-                        npm install
-                    """
-                    echo 'Testing..'
+                    sh 'npm install'
+                    echo 'Dependencies installed'
                 }
             }
         }
 
-        stage('Docker building') {
+        stage('Docker build & push') {
             steps {
                 script {
-                    withAWS(credentials: 'aws creds', region: 'ap-south-1') {
-                        sh """
-                            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 802104112912.dkr.ecr.ap-south-1.amazonaws.com
+                    withAWS(credentials: 'aws-creds', region: 'ap-south-1') {
+                        sh '''
+                            aws ecr get-login-password --region ap-south-1 \
+                            | docker login --username AWS --password-stdin 802104112912.dkr.ecr.ap-south-1.amazonaws.com
+
                             docker build -t roboshopcatalogue .
                             docker tag roboshopcatalogue:latest 802104112912.dkr.ecr.ap-south-1.amazonaws.com/roboshopcatalogue:latest
                             docker push 802104112912.dkr.ecr.ap-south-1.amazonaws.com/roboshopcatalogue:latest
-                        """
+                        '''
                     }
                     echo 'Docker build and push complete'
                 }
@@ -46,7 +46,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo "Deploying version ${appVersion}...."
+                echo "Deploying version ${env.appVersion}...."
             }
         }
     }
