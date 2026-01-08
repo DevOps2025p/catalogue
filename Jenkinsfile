@@ -1,10 +1,19 @@
 pipeline {
-    agent 
+    agent {
+        label 'jenkinsagent'
+    }
+    environment {
+        appVersion = ''
+    }
 
     stages {
-        stage('Build') {
+        stage('Read package.json') {
             steps {
-                echo 'Building..'
+                script {
+                    def packageJSON = readJSON file: 'package.json'
+                    appVersion = packageJSON.version
+                    echo "package version:$(appVersion)"
+                
             }
         }
         stage('Test') {
