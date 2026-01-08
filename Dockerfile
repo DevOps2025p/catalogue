@@ -3,7 +3,6 @@ WORKDIR /opt/server
 COPY package.json .
 COPY *.js .
 RUN npm install
-
 FROM node:20-alpine3.18
 RUN addgroup -S roboshop && adduser -S roboshop -G roboshop
 # Remove apk update/upgrade, only install if needed
@@ -14,7 +13,6 @@ WORKDIR /opt/server
 USER roboshop
 COPY --from=builder /opt/server /opt/server
 CMD ["node","server.js"]
-
 
 
 # FROM node:20-alpine3.21
