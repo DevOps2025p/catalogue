@@ -11,13 +11,18 @@ pipeline {
             steps {
                 script {
                     def packageJSON = readJSON file: 'package.json'
-                    env.appVersion = packageJSON.version
-                    echo "package version: ${env.appVersion}"
+                    appVersion = packageJSON.version
+                    echo "package version: ${appVersion}"
                 }
             }
         }
-        stage('Test') {
+        stage('Install Dependencies') {
             steps {
+                script{
+                   sh """
+                        npm install
+                    """    
+                }
                 echo 'Testing..'
             }
         }
